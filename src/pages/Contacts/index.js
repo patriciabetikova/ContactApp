@@ -3,14 +3,18 @@ import { Navbar, NavbarTitle, NavbarIconLink } from "styled/Navbar"
 import { Body } from "styled/Body"
 import { Text, Subtitle } from "styled/Typography"
 import { ContactPanel, ContactDetails, Img } from "./styled"
-import Button from "components/Button"
+import axios from "axios"
+import { connect } from "react-redux"
+import { fetchContacts, fetchContactsSuccess } from "data/contacts/actions"
 
 class Contacts extends React.Component {
-  constructor() {
-    super()
-    this.state = {
-      order: ""
-    }
+  componentDidMount() {
+    this.props.fetchContacts()
+    axios
+      .get("https://private-36f1e-contactstest.apiary-mock.com/contacts")
+      .then(result => {
+        this.props.fetchContactsSuccess(result.data.items)
+      })
   }
   render() {
     return (
@@ -20,80 +24,36 @@ class Contacts extends React.Component {
           <NavbarIconLink to="/addcontact">+</NavbarIconLink>
         </Navbar>
         <Body>
-          <ContactPanel to="/orders">
-            <Img src="https://via.placeholder.com/50" />
-            <ContactDetails>
-              <Subtitle>meno</Subtitle>
-              <Text>cisielko</Text>
-            </ContactDetails>
-          </ContactPanel>
-          <ContactPanel to="/orders">
-            <Img src="https://via.placeholder.com/50" />
-            <ContactDetails>
-              <Subtitle>meno</Subtitle>
-              <Text>cisielko</Text>
-            </ContactDetails>
-          </ContactPanel>
-          <ContactPanel to="/orders">
-            <Img src="https://via.placeholder.com/50" />
-            <ContactDetails>
-              <Subtitle>meno</Subtitle>
-              <Text>cisielko</Text>
-            </ContactDetails>
-          </ContactPanel>
-          <ContactPanel to="/orders">
-            <Img src="https://via.placeholder.com/50" />
-            <ContactDetails>
-              <Subtitle>meno</Subtitle>
-              <Text>cisielko</Text>
-            </ContactDetails>
-          </ContactPanel>
-          <ContactPanel to="/orders">
-            <Img src="https://via.placeholder.com/50" />
-            <ContactDetails>
-              <Subtitle>meno</Subtitle>
-              <Text>cisielko</Text>
-            </ContactDetails>
-          </ContactPanel>
-          <ContactPanel to="/orders">
-            <Img src="https://via.placeholder.com/50" />
-            <ContactDetails>
-              <Subtitle>meno</Subtitle>
-              <Text>cisielko</Text>
-            </ContactDetails>
-          </ContactPanel>
-          <ContactPanel to="/orders">
-            <Img src="https://via.placeholder.com/50" />
-            <ContactDetails>
-              <Subtitle>meno</Subtitle>
-              <Text>cisielko</Text>
-            </ContactDetails>
-          </ContactPanel>
-          <ContactPanel to="/orders">
-            <Img src="https://via.placeholder.com/50" />
-            <ContactDetails>
-              <Subtitle>meno</Subtitle>
-              <Text>cisielko</Text>
-            </ContactDetails>
-          </ContactPanel>
-          <ContactPanel to="/orders">
-            <Img src="https://via.placeholder.com/50" />
-            <ContactDetails>
-              <Subtitle>meno</Subtitle>
-              <Text>cisielko</Text>
-            </ContactDetails>
-          </ContactPanel>
-          <ContactPanel to="/orders">
-            <Img src="https://via.placeholder.com/50" />
-            <ContactDetails>
-              <Subtitle>meno</Subtitle>
-              <Text>cisielko</Text>
-            </ContactDetails>
-          </ContactPanel>
+          {this.props.loading ? (
+            "loading"
+          ) : (
+            <>
+              {this.props.contacts.map((x, i) => (
+                <ContactPanel key={x.id} to={`/orders/${x.id}`}>
+                  <Img src={x.pictureUrl || "https://via.placeholder.com/50"} />
+                  <ContactDetails>
+                    <Subtitle>{x.name}</Subtitle>
+                    <Text>{x.phone}</Text>
+                  </ContactDetails>
+                </ContactPanel>
+              ))}
+            </>
+          )}
         </Body>
       </div>
     )
   }
 }
 
-export default Contacts
+const mapStateToProps = state => ({
+  loading: state.contacts.contactsLoading,
+  contacts: state.contacts.contacts
+})
+const mapDispatchToProps = {
+  fetchContacts,
+  fetchContactsSuccess
+}
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Contacts)
