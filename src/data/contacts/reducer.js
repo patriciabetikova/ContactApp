@@ -1,8 +1,7 @@
 const initialState = {
   contacts: [],
   contactsLoading: false,
-  orders: [],
-  ordersLoading: false
+  orders: {}
 }
 
 export const contactsReducer = (state = initialState, action) => {
@@ -21,13 +20,23 @@ export const contactsReducer = (state = initialState, action) => {
     case "FETCH_ORDERS":
       return {
         ...state,
-        ordersLoading: true
+        orders: {
+          ...state.orders,
+          [action.payload]: {
+            loading: true
+          }
+        }
       }
     case "FETCH_ORDERS_SUCCESS":
       return {
         ...state,
-        orders: action.payload,
-        ordersLoading: false
+        orders: {
+          ...state.orders,
+          [action.payload.id]: {
+            loading: false,
+            items: action.payload.items
+          }
+        }
       }
     default:
       return state

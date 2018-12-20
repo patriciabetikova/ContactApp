@@ -3,9 +3,8 @@ import { Navbar, NavbarTitle, NavbarIconLink } from "styled/Navbar"
 import { Body } from "styled/Body"
 import { Text, Subtitle } from "styled/Typography"
 import { ContactPanel, ContactDetails, Img } from "./styled"
-import axios from "axios"
 import { connect } from "react-redux"
-import { fetchContacts, fetchContactsSuccess } from "data/contacts/actions"
+import { fetchContactsThunk } from "data/contacts/thunks"
 import { compose } from "recompose"
 import withOnMount from "hocs/withOnMount"
 
@@ -40,30 +39,15 @@ const mapStateToProps = state => ({
   contacts: state.contacts.contacts
 })
 const mapDispatchToProps = {
-  fetchContacts,
-  fetchContactsSuccess
+  fetchContactsThunk
 }
 export default compose(
   connect(
     mapStateToProps,
     mapDispatchToProps
   ),
-  // lifecycle({
-  //   componentDidMount() {
-  //     this.props.fetchContacts()
-  //     axios
-  //       .get("https://private-36f1e-contactstest.apiary-mock.com/contacts")
-  //       .then(result => {
-  //         this.props.fetchContactsSuccess(result.data.items)
-  //       })
-  //   }
-  // }),
   withOnMount(props => {
-    props.fetchContacts()
-    axios
-      .get("https://private-36f1e-contactstest.apiary-mock.com/contacts")
-      .then(result => {
-        props.fetchContactsSuccess(result.data.items)
-      })
+    if (props.contacts.length > 0) return
+    props.fetchContactsThunk()
   })
 )(Contacts)

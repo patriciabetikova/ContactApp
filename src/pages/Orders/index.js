@@ -1,6 +1,5 @@
 import React from "react"
 import { Navbar, NavbarTitle, NavbarIconLink } from "styled/Navbar"
-
 import {
   OrderItem,
   Contact,
@@ -8,23 +7,12 @@ import {
   ContactSubtitle,
   ContactText
 } from "./styled"
-import axios from "axios"
-import { fetchOrders, fetchOrdersSuccess } from "data/contacts/actions"
 import { connect } from "react-redux"
+import { fetchOrdersThunk } from "data/contacts/thunks"
 
 class Orders extends React.Component {
   componentDidMount() {
-    this.props.fetchOrders()
-    axios
-      .get(
-        `https://private-36f1e-contactstest.apiary-mock.com/contacts/${
-          this.props.match.params.id
-        }/order`
-      )
-      .then(result => {
-        console.log(result)
-        this.props.fetchOrdersSuccess(result.data.items)
-      })
+    this.props.fetchOrdersThunk(this.props.match.params.id)
   }
 
   render() {
@@ -44,8 +32,8 @@ class Orders extends React.Component {
               <ContactText fs={20}>{this.props.contact.phone}</ContactText>
             </Contact>
             <OrdersBody>
-              {this.props.orders.map(x => (
-                <OrderItem>
+              {this.props.orders.map((x, i) => (
+                <OrderItem key={i}>
                   <h3>{x.name}</h3>
                   <h3>{x.count}</h3>
                 </OrderItem>
@@ -60,19 +48,15 @@ class Orders extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const contactFromStore = state.contacts.contacts.find(
-    x => x.id === props.match.params.id
-  )
   return {
-    orders: state.contacts.orders,
-    loading: state.contacts.ordersLoading,
-    contact: contactFromStore || state.contacts.contacts
+    orders: state.contacts.orders[props.match.params.id].items,
+    loading: state.contacts.orders[props.match.params.id].loading,
+    contact: state.contacts.contacts.find(x => x.id === props.match.params.id)
   }
 }
 
 const mapDispatchToProps = {
-  fetchOrders,
-  fetchOrdersSuccess
+  fetchOrdersThunk
 }
 
 export default connect(

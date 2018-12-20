@@ -7,11 +7,15 @@ export const fetchContactsSuccess = x => ({
   payload: x
 })
 
-export const fetchOrders = () => ({
-  type: "FETCH_ORDERS"
+export const fetchOrders = id => ({
+  type: "FETCH_ORDERS",
+  payload: id
 })
 
-export const fetchOrdersSuccess = x => ({
+export const fetchOrdersSuccess = (id, items) => ({
   type: "FETCH_ORDERS_SUCCESS",
-  payload: x
+  payload: {
+    id,
+    items
+  }
 })
